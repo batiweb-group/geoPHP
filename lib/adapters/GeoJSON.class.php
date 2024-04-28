@@ -9,15 +9,21 @@
 class GeoJSON extends GeoAdapter
 {
   /**
+   * @var null|callable $convertPoint
+   */
+  private $convertPoint;
+
+  /**
    * Given an object or a string, return a Geometry
    *
    * @param mixed $input The GeoJSON string or object
    *
    * @return object Geometry
    */
-  public function read($input) {
+  public function read($input, $convertPoint = null) {
+    $this->convertPoint = $convertPoint;
     if (is_string($input)) {
-      $input = json_decode($input);
+      $input = json_decode($input, null, 2048);
     }
     if (!is_object($input)) {
       throw new Exception('Invalid JSON');
@@ -56,7 +62,11 @@ class GeoJSON extends GeoAdapter
 
   private function arrayToPoint($array) {
     if (!empty($array)) {
-      return new Point($array[0], $array[1]);
+      $point = new Point($array[0], $array[1]);
+      if($this->convertPoint) {
+        $point = call_user_func($this->convertPoint, $point);
+      }
+      return $point;
     }
     else {
       return new Point();

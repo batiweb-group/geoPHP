@@ -35,7 +35,7 @@ class geoPHP
 {
 
   static function version() {
-    return '1.2';
+    return '1.3';
   }
 
   // geoPHP::load($data, $type, $other_args);
