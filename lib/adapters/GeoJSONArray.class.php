@@ -1,6 +1,6 @@
 <?php
 /**
- * GeoJSON class : a geojson reader/writer.
+ * GeoJSONArray class : a geojson reader/writer.
  *
  * Note that it will always return a GeoJSON geometry. This
  * means that if you pass it a feature, it will return the
@@ -8,6 +8,11 @@
  */
 class GeoJSONArray extends GeoAdapter
 {
+  /**
+   * @var null|callable $convertPoint
+   */
+  public static $convertPoint;
+
   /**
    * Given an object or a string, return a Geometry
    *
@@ -29,7 +34,7 @@ class GeoJSONArray extends GeoAdapter
     // Check to see if it's a FeatureCollection
     if ($input['type'] == 'FeatureCollection') {
       $geoms = array();
-      foreach ($input->features as $feature) {
+      foreach ($input['features'] as $feature) {
         $geoms[] = $this->read($feature);
       }
       return geoPHP::geometryReduce($geoms);
@@ -56,7 +61,11 @@ class GeoJSONArray extends GeoAdapter
 
   private function arrayToPoint($array) {
     if (!empty($array)) {
-      return new Point($array[0], $array[1]);
+      $point = new Point($array[0], $array[1]);
+      if(self::$convertPoint) {
+        $point = call_user_func(self::$convertPoint, $point);
+      }
+      return $point;
     }
     else {
       return new Point();
