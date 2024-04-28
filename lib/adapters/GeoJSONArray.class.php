@@ -6,7 +6,7 @@
  * means that if you pass it a feature, it will return the
  * geometry of that feature strip everything else.
  */
-class GeoJSON extends GeoAdapter
+class GeoJSONArray extends GeoAdapter
 {
   /**
    * Given an object or a string, return a Geometry
@@ -17,17 +17,17 @@ class GeoJSON extends GeoAdapter
    */
   public function read($input) {
     if (is_string($input)) {
-      $input = json_decode($input, null, 2048);
+      $input = json_decode($input, true, 2048);
     }
-    if (!is_object($input)) {
+    if (!is_array($input)) {
       throw new Exception('Invalid JSON');
     }
-    if (!is_string($input->type)) {
+    if (!is_string($input['type'])) {
       throw new Exception('Invalid JSON');
     }
 
     // Check to see if it's a FeatureCollection
-    if ($input->type == 'FeatureCollection') {
+    if ($input['type'] == 'FeatureCollection') {
       $geoms = array();
       foreach ($input->features as $feature) {
         $geoms[] = $this->read($feature);
@@ -36,8 +36,8 @@ class GeoJSON extends GeoAdapter
     }
 
     // Check to see if it's a Feature
-    if ($input->type == 'Feature') {
-      return $this->read($input->geometry);
+    if ($input['type'] == 'Feature') {
+      return $this->read($input['geometry']);
     }
 
     // It's a geometry - process it
@@ -45,13 +45,13 @@ class GeoJSON extends GeoAdapter
   }
 
   private function objToGeom($obj) {
-    $type = $obj->type;
+    $type = $obj['type'];
 
     if ($type == 'GeometryCollection') {
       return $this->objToGeometryCollection($obj);
     }
     $method = 'arrayTo' . $type;
-    return $this->$method($obj->coordinates);
+    return $this->$method($obj['coordinates']);
   }
 
   private function arrayToPoint($array) {
@@ -105,10 +105,10 @@ class GeoJSON extends GeoAdapter
 
   private function objToGeometryCollection($obj) {
     $geoms = array();
-    if (empty($obj->geometries)) {
+    if (empty($obj['geometries'])) {
       throw new Exception('Invalid GeoJSON: GeometryCollection with no component geometries');
     }
-    foreach ($obj->geometries as $comp_object) {
+    foreach ($obj['geometries'] as $comp_object) {
       $geoms[] = $this->objToGeom($comp_object);
     }
     return new GeometryCollection($geoms);
@@ -131,7 +131,7 @@ class GeoJSON extends GeoAdapter
     }
   }
 
-  public function getArray($geometry) {
+  public function getArray(Collection $geometry) {
     if ($geometry->getGeomType() == 'GeometryCollection') {
       $component_array = array();
       foreach ($geometry->components as $component) {
