@@ -10,7 +10,6 @@
 // Adapters
 include_once("lib/adapters/GeoAdapter.class.php"); // Abtract class
 include_once("lib/adapters/GeoJSON.class.php");
-include_once("lib/adapters/GeoJSONArray.class.php");
 include_once("lib/adapters/WKT.class.php");
 include_once("lib/adapters/EWKT.class.php");
 include_once("lib/adapters/WKB.class.php");
@@ -98,8 +97,6 @@ class geoPHP
       'ewkb' => 'EWKB',
       'json' => 'GeoJSON',
       'geojson' => 'GeoJSON',
-      'json_array' => 'GeoJSONArray',
-      'geojson_array' => 'GeoJSONArray',
       'kml' =>  'KML',
       'gpx' =>  'GPX',
       'georss' => 'GeoRSS',
