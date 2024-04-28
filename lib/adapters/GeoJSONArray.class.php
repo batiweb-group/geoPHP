@@ -122,13 +122,8 @@ class GeoJSONArray extends GeoAdapter
    *
    * @return string The GeoJSON string
    */
-  public function write(Geometry $geometry, $return_array = FALSE) {
-    if ($return_array) {
-      return $this->getArray($geometry);
-    }
-    else {
-      return json_encode($this->getArray($geometry));
-    }
+  public function write(Geometry $geometry) {
+    return $this->getArray($geometry);
   }
 
   public function getArray(Collection $geometry) {
