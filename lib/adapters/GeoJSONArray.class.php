@@ -11,7 +11,7 @@ class GeoJSONArray extends GeoAdapter
   /**
    * @var null|callable $convertPoint
    */
-  public static $convertPoint;
+  private $convertPoint;
 
   /**
    * Given an object or a string, return a Geometry
@@ -20,7 +20,8 @@ class GeoJSONArray extends GeoAdapter
    *
    * @return object Geometry
    */
-  public function read($input) {
+  public function read($input, $convertPoint = null) {
+    $this->convertPoint = $convertPoint;
     if (is_string($input)) {
       $input = json_decode($input, true, 2048);
     }
@@ -62,8 +63,8 @@ class GeoJSONArray extends GeoAdapter
   private function arrayToPoint($array) {
     if (!empty($array)) {
       $point = new Point($array[0], $array[1]);
-      if(self::$convertPoint) {
-        $point = call_user_func(self::$convertPoint, $point);
+      if($this->convertPoint) {
+        $point = call_user_func($this->convertPoint, $point);
       }
       return $point;
     }
